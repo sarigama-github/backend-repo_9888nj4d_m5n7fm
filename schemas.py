@@ -13,8 +13,9 @@ Model name is converted to lowercase for the collection name:
 
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import datetime, date, time
 
-# Example schemas (replace with your own):
+# Example schemas (kept for reference)
 
 class User(BaseModel):
     """
@@ -38,8 +39,23 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Production tracking schema
+class Productionrecord(BaseModel):
+    """
+    Production records for each entry
+    Collection name: "productionrecord" (lowercase of class name)
+    """
+    date: date = Field(..., description="Production date (local plant date)")
+    time: Optional[time] = Field(None, description="Time of the entry (local time)")
+    shift: str = Field(..., description="Shift identifier: A (07:00-15:30) or B (15:30-24:00)")
+    line: Optional[str] = Field(None, description="Line/Machine/Station identifier")
+    product: Optional[str] = Field(None, description="Product or part number")
+    operator: Optional[str] = Field(None, description="Operator name or ID")
+    count: int = Field(..., ge=0, description="Good units produced")
+    defects: Optional[int] = Field(0, ge=0, description="Defective units")
+    notes: Optional[str] = Field(None, description="Additional notes")
+
+    # Metadata fields will be added by database helpers: created_at, updated_at
 
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
